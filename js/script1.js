@@ -5,7 +5,7 @@ const exit_btn = document.querySelector(".buttons .quit");
 const continue_btn = document.querySelector(".buttons .restart");
 const quiz_box = document.querySelector(".quiz_box");
 const timeCount = quiz_box.querySelector(".timer .timer_sec");
-const timeLine = quiz_box.querySelector("header .time_line");
+// const timeLine = quiz_box.querySelector("header .time_line");
 const timeOff = quiz_box.querySelector("header .time_text");
 
 const option_list = document.querySelector(".option_list");
@@ -38,7 +38,7 @@ continue_btn.onclick = () => {
   showQuestions(0);
   queCounter(1);
   startTimer(totalTime);
-  startTimerLine(0);
+  //   startTimerLine(0);
 };
 
 let que_count = 0;
@@ -53,6 +53,15 @@ const next_btn = quiz_box.querySelector(".next_btn");
 const result_box = document.querySelector(".result_box");
 const restart_quiz = result_box.querySelector(".buttons .restart");
 const quit_quiz = result_box.querySelector(".buttons .quit");
+
+function checkArrayEquality(_array1, _array2) {
+  return (
+    _array1.length === _array2.length &&
+    _array1.every(function (_array1_i, i) {
+      return _array1_i === _array2[i];
+    })
+  );
+}
 
 restart_quiz.onclick = () => {
   quiz_box.classList.add("activeQuiz");
@@ -71,7 +80,7 @@ restart_quiz.onclick = () => {
   clearInterval(counter);
   startTimer(timeValue);
   clearInterval(counterLine);
-  startTimerLine(widthValue);
+  //   startTimerLine(widthValue);
   next_btn.style.display = "none";
   timeOff.textContent = "Time Left";
 };
@@ -98,6 +107,13 @@ next_btn.onclick = () => {
       if (areEqual(optionsSelected, correctAns)) {
         userScore += 1;
       }
+    } else if (questions[que_count].type === "FITB2") {
+      correctAns = questions[que_count].answers;
+
+      //check if the array and their order is equal
+      if (checkArrayEquality(correctAns, optionsSelected)) {
+        userScore += 1;
+      }
     }
 
     que_count++;
@@ -108,7 +124,7 @@ next_btn.onclick = () => {
     // clearInterval(counter);
     // startTimer(timeValue);
     clearInterval(counterLine);
-    startTimerLine(widthValue);
+    // startTimerLine(widthValue);
     next_btn.style.display = "none";
     timeOff.textContent = "Time Left";
   } else {
@@ -130,6 +146,13 @@ next_btn.onclick = () => {
         if (areEqual(optionsSelected, correctAns)) {
           userScore += 1;
         }
+      } else if (questions[que_count].type === "FITB2") {
+        correctAns = questions[que_count].answers;
+
+        //check if array are equal and in same order
+        if (checkArrayEquality(correctAns, optionsSelected)) {
+          userScore += 1;
+        }
       }
     }
     showResultBox(userScore);
@@ -148,7 +171,7 @@ function showQuestions(index) {
       ". " +
       questions[index].question +
       "</span>";
-  } else {
+  } else if (questions[index].type === "FITB1") {
     que_tag =
       "<span>" +
       questions[index].numb +
@@ -162,6 +185,28 @@ function showQuestions(index) {
       " " +
       questions[index].question.substring(
         questions[index].question.indexOf("}") + 1
+      ) +
+      "</span>";
+  } else if (questions[index].type === "FITB2") {
+    que_tag =
+      "<span>" +
+      questions[index].numb +
+      ". " +
+      questions[index].question.substring(
+        0,
+        questions[index].question.indexOf("{") - 1
+      ) +
+      " " +
+      '<input type="text" id="FITB2_1" required />' +
+      " " +
+      questions[index].question.substring(
+        questions[index].question.indexOf("}") + 1,
+        questions[index].question.lastIndexOf("{") - 1
+      ) +
+      '<input type="text" id="FITB2_2" required />' +
+      " " +
+      questions[index].question.substring(
+        questions[index].question.lastIndexOf("}") + 1
       ) +
       "</span>";
   }
@@ -189,6 +234,16 @@ function showQuestions(index) {
     }
   } else if (document.getElementById("FITB1")) {
     document.getElementById("FITB1").setAttribute("onchange", "valueEntered()");
+  } else if (
+    document.getElementById("FITB2_1") &&
+    document.getElementById("FITB2_2")
+  ) {
+    document
+      .getElementById("FITB2_1")
+      .setAttribute("onchange", "valueEntered()");
+    document
+      .getElementById("FITB2_2")
+      .setAttribute("onchange", "valueEntered()");
   }
 }
 
@@ -216,6 +271,17 @@ function valueEntered() {
     next_btn.style.display = "block";
     if (questions[que_count].type === "FITB1") {
       optionsSelected.push(userAns);
+    }
+  } else if (
+    document.getElementById("FITB2_1") &&
+    document.getElementById("FITB2_1").value &&
+    document.getElementById("FITB2_2") &&
+    document.getElementById("FITB2_2").value
+  ) {
+    next_btn.style.display = "block";
+    if (questions[que_count].type === "FITB2") {
+      optionsSelected.push(document.getElementById("FITB2_1").value);
+      optionsSelected.push(document.getElementById("FITB2_2").value);
     }
   } else {
     next_btn.style.display = "none";
@@ -312,16 +378,16 @@ function startTimer(time) {
   }
 }
 
-function startTimerLine(time) {
-  counterLine = setInterval(timer, 29);
-  function timer() {
-    time++;
-    timeLine.style.width = time + "px";
-    if (time > 549) {
-      clearInterval(counterLine);
-    }
-  }
-}
+// function startTimerLine(time) {
+//   counterLine = setInterval(timer, 29);
+//   function timer() {
+//     time++;
+//     timeLine.style.width = time + "px";
+//     if (time > 549) {
+//       clearInterval(counterLine);
+//     }
+//   }
+// }
 
 function queCounter(index) {
   const bottom_ques_counter = quiz_box.querySelector(".total_que");

@@ -1,13 +1,21 @@
 let questions = [
   {
     numb: 1,
+    question:
+      "India is {} largest country by population and ranks {} in terms of landmass",
+    type: "FITB2",
+    time: 20,
+    answers: ["second", "seventh"],
+  },
+  {
+    numb: 2,
     question: "India is {} largest country by population",
     type: "FITB1",
     time: 20,
     answers: ["second"],
   },
   {
-    numb: 2,
+    numb: 3,
     question: "Select top two countries which has highest GDP?",
     type: "MAQ",
     time: 20,
@@ -15,7 +23,7 @@ let questions = [
     answers: ["USA", "China"],
   },
   {
-    numb: 3,
+    numb: 4,
     question:
       "Which among the following is the most valuable company in the world?",
     type: "MCQ",
