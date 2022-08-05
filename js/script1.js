@@ -10,6 +10,10 @@ const timeOff = quiz_box.querySelector("header .time_text");
 
 const option_list = document.querySelector(".option_list");
 
+let optionsSelected = [];
+let correctAns;
+let userAns;
+
 //if start quiz button clicked
 start_btn.onclick = () => {
   info_box.classList.add("activeInfo"); //show the info box
@@ -70,8 +74,22 @@ quit_quiz.onclick = () => {
 //if next button clicked
 next_btn.onclick = () => {
   if (que_count < questions.length - 1) {
+    if (questions[que_count].type === "MAQ") {
+      correctAns = questions[que_count].answers;
+      if (areEqual(optionsSelected, correctAns)) {
+        userScore += 1;
+      }
+    } else if (questions[que_count].type === "MCQ") {
+      correctAns = questions[que_count].answer;
+      if (optionsSelected.includes(correctAns)) {
+        userScore += 1;
+      }
+    }
+    console.log(userScore);
+
     que_count++;
     que_numb++;
+    optionsSelected = [];
     showQuestions(que_count);
     queCounter(que_numb);
     clearInterval(counter);
@@ -83,6 +101,21 @@ next_btn.onclick = () => {
   } else {
     clearInterval(counter);
     clearInterval(counterLine);
+    if (que_count <= questions.length - 1) {
+      if (questions[que_count].type === "MAQ") {
+        correctAns = questions[que_count].answers;
+        if (areEqual(optionsSelected, correctAns)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "MCQ") {
+        correctAns = questions[que_count].answer;
+        if (optionsSelected.includes(correctAns)) {
+          userScore += 1;
+        }
+      }
+      console.log(userScore);
+    }
+
     console.log("Questions completed");
     showResultBox();
   }
@@ -97,19 +130,21 @@ function showQuestions(index) {
     ". " +
     questions[index].question +
     "</span>";
-  let option_tag =
-    '<div class="option"><span>' +
-    questions[index].options[0] +
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[1] +
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[2] +
-    "</span></div>" +
-    '<div class="option"><span>' +
-    questions[index].options[3] +
-    "</span></div>";
+
+  let option_tag;
+  if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
+    option_tag =
+      '<div class="option"><span>' +
+      questions[index].answer_choices[0] +
+      "</span></div>";
+
+    for (let i = 1; i < questions[index].answer_choices.length; i++) {
+      option_tag +=
+        '<div class="option"><span>' +
+        questions[index].answer_choices[i] +
+        "</span></div>";
+    }
+  }
   que_text.innerHTML = que_tag;
   option_list.innerHTML = option_tag;
   const option = option_list.querySelectorAll(".option");
@@ -121,35 +156,65 @@ function showQuestions(index) {
 let tickIcon = '<div class="icon tick"><i class="fas fa-check"></i></div>';
 let crossIcon = '<div class="icon cross"><i class="fas fa-times"></i></div>';
 
+function areEqual(array1, array2) {
+  if (array1.length === array2.length) {
+    return array1.every((element, index) => {
+      if (element === array2[index]) {
+        return true;
+      }
+      return false;
+    });
+  }
+  return false;
+}
+
 function optionSelected(answer) {
   clearInterval(counter);
   clearInterval(counterLine);
-  let userAns = answer.textContent;
-  let correctAns = questions[que_count].answer;
-  let allOptions = option_list.children.length;
-  if (userAns == correctAns) {
-    userScore += 1;
-    answer.classList.add("correct");
-    console.log("Answer is correct");
-    answer.insertAdjacentHTML("beforeend", tickIcon);
-  } else {
-    answer.classList.add("incorrect");
-    console.log("Answer is wrong");
-    answer.insertAdjacentHTML("beforeend", crossIcon);
+  userAns = answer.textContent;
+  if (questions[que_count].type === "MAQ") {
+    optionsSelected.push(userAns);
 
-    //if answer is incorrect then automatically selected the correct answer
-    for (let i = 0; i < allOptions; i++) {
-      if (option_list.children[i].textContent == correctAns) {
-        option_list.children[i].setAttribute("class", "option correct");
-        option_list.children[i].insertAdjacentHTML("beforeend", tickIcon);
-      }
+    if (answer.classList.contains("selected")) {
+      answer.classList.remove("selected");
+    } else {
+      answer.classList.add("selected");
     }
+  } else if (questions[que_count].type === "MCQ") {
+    optionsSelected = [];
+    optionsSelected.push(userAns);
+
+    let list = document.getElementsByClassName("selected");
+    for (let i = 0; i < list.length; i++) {
+      list[i].classList.remove("selected");
+    }
+    answer.classList.add("selected");
   }
+  console.log(answer);
+
+  //   let allOptions = option_list.children.length;
+  //   if (userAns == correctAns) {
+  //     userScore += 1;
+  // answer.classList.add("correct");
+  // console.log("Answer is correct");
+  // answer.insertAdjacentHTML("beforeend", tickIcon);
+  //   } else {
+  // answer.classList.add("incorrect");
+  // console.log("Answer is wrong");
+  // answer.insertAdjacentHTML("beforeend", crossIcon);
+  //if answer is incorrect then automatically selected the correct answer
+  // for (let i = 0; i < allOptions; i++) {
+  //   if (option_list.children[i].textContent == correctAns) {
+  //     option_list.children[i].setAttribute("class", "option correct");
+  //     option_list.children[i].insertAdjacentHTML("beforeend", tickIcon);
+  //   }
+  // }
+  //   }
 
   //once user selected disabled all options
-  for (let i = 0; i < allOptions; i++) {
-    option_list.children[i].classList.add("disabled");
-  }
+  //   for (let i = 0; i < allOptions; i++) {
+  //     option_list.children[i].classList.add("disabled");
+  //   }
 
   next_btn.style.display = "block";
 }
