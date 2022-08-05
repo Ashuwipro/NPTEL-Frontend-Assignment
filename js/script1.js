@@ -13,6 +13,7 @@ const option_list = document.querySelector(".option_list");
 let optionsSelected = [];
 let correctAns;
 let userAns;
+let totalTime = 0;
 
 //if start quiz button clicked
 start_btn.onclick = () => {
@@ -28,9 +29,15 @@ exit_btn.onclick = () => {
 continue_btn.onclick = () => {
   info_box.classList.remove("activeInfo"); //hide the info box
   quiz_box.classList.add("activeQuiz"); //show the quiz box
+
+  //getting the total time
+  for (let i = 0; i < questions.length; i++) {
+    totalTime += questions[i].time;
+  }
+
   showQuestions(0);
   queCounter(1);
-  startTimer(15);
+  startTimer(totalTime);
   startTimerLine(0);
 };
 
@@ -38,7 +45,7 @@ let que_count = 0;
 let que_numb = 1;
 let counter;
 let counterLine;
-let timeValue = 15;
+let timeValue = totalTime;
 let widthValue = 0;
 let userScore = 0;
 
@@ -50,12 +57,14 @@ const quit_quiz = result_box.querySelector(".buttons .quit");
 restart_quiz.onclick = () => {
   quiz_box.classList.add("activeQuiz");
   result_box.classList.remove("activeResult");
+  optionsSelected = [];
+  option_list.textContent = "";
 
-  let que_count = 0;
-  let que_numb = 1;
-  let timeValue = 15;
-  let widthValue = 0;
-  let userScore = 0;
+  que_count = 0;
+  que_numb = 1;
+  timeValue = totalTime;
+  widthValue = 0;
+  userScore = 0;
 
   showQuestions(que_count);
   queCounter(que_numb);
@@ -84,16 +93,20 @@ next_btn.onclick = () => {
       if (optionsSelected.includes(correctAns)) {
         userScore += 1;
       }
+    } else if (questions[que_count].type === "FITB1") {
+      correctAns = questions[que_count].answers;
+      if (areEqual(optionsSelected, correctAns)) {
+        userScore += 1;
+      }
     }
-    console.log(userScore);
 
     que_count++;
     que_numb++;
     optionsSelected = [];
     showQuestions(que_count);
     queCounter(que_numb);
-    clearInterval(counter);
-    startTimer(timeValue);
+    // clearInterval(counter);
+    // startTimer(timeValue);
     clearInterval(counterLine);
     startTimerLine(widthValue);
     next_btn.style.display = "none";
@@ -112,24 +125,46 @@ next_btn.onclick = () => {
         if (optionsSelected.includes(correctAns)) {
           userScore += 1;
         }
+      } else if (questions[que_count].type === "FITB1") {
+        correctAns = questions[que_count].answers;
+        if (areEqual(optionsSelected, correctAns)) {
+          userScore += 1;
+        }
       }
-      console.log(userScore);
     }
-
-    console.log("Questions completed");
-    showResultBox();
+    showResultBox(userScore);
   }
 };
 
 //getting questions and options from array
 function showQuestions(index) {
   const que_text = document.querySelector(".que_text");
-  let que_tag =
-    "<span>" +
-    questions[index].numb +
-    ". " +
-    questions[index].question +
-    "</span>";
+
+  let que_tag;
+  if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
+    que_tag =
+      "<span>" +
+      questions[index].numb +
+      ". " +
+      questions[index].question +
+      "</span>";
+  } else {
+    que_tag =
+      "<span>" +
+      questions[index].numb +
+      ". " +
+      questions[index].question.substring(
+        0,
+        questions[index].question.indexOf("{") - 1
+      ) +
+      " " +
+      '<input type="text" id="FITB1" required />' +
+      " " +
+      questions[index].question.substring(
+        questions[index].question.indexOf("}") + 1
+      ) +
+      "</span>";
+  }
 
   let option_tag;
   if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
@@ -146,15 +181,19 @@ function showQuestions(index) {
     }
   }
   que_text.innerHTML = que_tag;
-  option_list.innerHTML = option_tag;
-  const option = option_list.querySelectorAll(".option");
-  for (let i = 0; i < option.length; i++) {
-    option[i].setAttribute("onclick", "optionSelected(this)");
+  if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
+    option_list.innerHTML = option_tag;
+    const option = option_list.querySelectorAll(".option");
+    for (let i = 0; i < option.length; i++) {
+      option[i].setAttribute("onclick", "optionSelected(this)");
+    }
+  } else if (document.getElementById("FITB1")) {
+    document.getElementById("FITB1").setAttribute("onchange", "valueEntered()");
   }
 }
 
-let tickIcon = '<div class="icon tick"><i class="fas fa-check"></i></div>';
-let crossIcon = '<div class="icon cross"><i class="fas fa-times"></i></div>';
+// let tickIcon = '<div class="icon tick"><i class="fas fa-check"></i></div>';
+// let crossIcon = '<div class="icon cross"><i class="fas fa-times"></i></div>';
 
 function areEqual(array1, array2) {
   if (array1.length === array2.length) {
@@ -168,8 +207,23 @@ function areEqual(array1, array2) {
   return false;
 }
 
+function valueEntered() {
+  if (
+    document.getElementById("FITB1") &&
+    document.getElementById("FITB1").value
+  ) {
+    userAns = document.getElementById("FITB1").value;
+    next_btn.style.display = "block";
+    if (questions[que_count].type === "FITB1") {
+      optionsSelected.push(userAns);
+    }
+  } else {
+    next_btn.style.display = "none";
+  }
+}
+
 function optionSelected(answer) {
-  clearInterval(counter);
+  //   clearInterval(counter);
   clearInterval(counterLine);
   userAns = answer.textContent;
   if (questions[que_count].type === "MAQ") {
@@ -192,34 +246,10 @@ function optionSelected(answer) {
   }
   console.log(answer);
 
-  //   let allOptions = option_list.children.length;
-  //   if (userAns == correctAns) {
-  //     userScore += 1;
-  // answer.classList.add("correct");
-  // console.log("Answer is correct");
-  // answer.insertAdjacentHTML("beforeend", tickIcon);
-  //   } else {
-  // answer.classList.add("incorrect");
-  // console.log("Answer is wrong");
-  // answer.insertAdjacentHTML("beforeend", crossIcon);
-  //if answer is incorrect then automatically selected the correct answer
-  // for (let i = 0; i < allOptions; i++) {
-  //   if (option_list.children[i].textContent == correctAns) {
-  //     option_list.children[i].setAttribute("class", "option correct");
-  //     option_list.children[i].insertAdjacentHTML("beforeend", tickIcon);
-  //   }
-  // }
-  //   }
-
-  //once user selected disabled all options
-  //   for (let i = 0; i < allOptions; i++) {
-  //     option_list.children[i].classList.add("disabled");
-  //   }
-
   next_btn.style.display = "block";
 }
 
-function showResultBox() {
+function showResultBox(userScore) {
   info_box.classList.remove("activeInfo"); //hide the info box
   quiz_box.classList.remove("activeQuiz"); //hide the quiz box
   result_box.classList.add("activeResult"); //show the result box
@@ -297,7 +327,7 @@ function queCounter(index) {
   const bottom_ques_counter = quiz_box.querySelector(".total_que");
   let totalQuesCountTag =
     "<span><p>" +
-    que_numb +
+    index +
     "</p> of <p>" +
     questions.length +
     "</p> Questions</span>";
