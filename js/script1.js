@@ -1,3 +1,16 @@
+//waiting till dom is loaded
+let questions;
+
+const renderQuestions = async () => {
+  let uri = "http://localhost:3000/questions";
+
+  const res = await fetch(uri);
+  questions = await res.json();
+  console.log(questions);
+};
+
+window.addEventListener("DOMContentLoaded", () => renderQuestions());
+
 //getting all required elements
 const start_btn = document.querySelector(".start_btn button");
 const info_box = document.querySelector(".info_box");
