@@ -105,7 +105,16 @@ quit_quiz.onclick = () => {
 //if next button clicked
 next_btn.onclick = () => {
   if (que_count < questions.length - 1) {
-    if (questions[que_count].type === "MAQ") {
+    if (questions[que_count].type === "MTF") {
+      correctAns = [];
+      for (let i = 0; i < questions[que_count].answer_options.length; i++) {
+        correctAns.push(questions[que_count].answer_options[i].Capital);
+      }
+      //check if the array and their order is equal
+      if (checkArrayEquality(correctAns, optionsSelected)) {
+        userScore += 1;
+      }
+    } else if (questions[que_count].type === "MAQ") {
       correctAns = questions[que_count].answers;
       if (areEqual(optionsSelected, correctAns)) {
         userScore += 1;
@@ -132,6 +141,7 @@ next_btn.onclick = () => {
     que_count++;
     que_numb++;
     optionsSelected = [];
+    option_list.textContent = "";
     showQuestions(que_count);
     queCounter(que_numb);
     // clearInterval(counter);
@@ -144,7 +154,16 @@ next_btn.onclick = () => {
     clearInterval(counter);
     clearInterval(counterLine);
     if (que_count <= questions.length - 1) {
-      if (questions[que_count].type === "MAQ") {
+      if (questions[que_count].type === "MTF") {
+        correctAns = [];
+        for (let i = 0; i < questions[que_count].answer_options.length; i++) {
+          correctAns.push(questions[que_count].answer_options[i].Capital);
+        }
+        //check if the array and their order is equal
+        if (checkArrayEquality(correctAns, optionsSelected)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "MAQ") {
         correctAns = questions[que_count].answers;
         if (areEqual(optionsSelected, correctAns)) {
           userScore += 1;
@@ -222,10 +241,67 @@ function showQuestions(index) {
         questions[index].question.lastIndexOf("}") + 1
       ) +
       "</span>";
+  } else if (questions[index].type === "MTF") {
+    que_tag =
+      "<span id='MTF'>" +
+      questions[index].numb +
+      ". " +
+      questions[index].question +
+      "</span><br>" +
+      "<div style='display:flex;justify-content:space-evenly;'>" +
+      "<span>States</span><span>Capitals</span></div>";
   }
 
   let option_tag;
-  if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
+  if (questions[index].type === "MTF") {
+    let state_list = [];
+    for (let i = 0; i < questions[index].answer_options.length; i++) {
+      state_list.push(questions[index].answer_options[i].State);
+    }
+    let capital_list = [];
+    for (let i = 0; i < questions[index].answer_options.length; i++) {
+      capital_list.push(questions[index].answer_options[i].Capital);
+    }
+
+    drpdwnTag = "<option value='0'></option>";
+    for (let i = 0; i < capital_list.length; i++) {
+      drpdwnTag +=
+        "<option value='" +
+        capital_list[i] +
+        "'>" +
+        capital_list[i] +
+        "</option>";
+    }
+
+    option_tag =
+      "<div style='display:flex;justify-content:space-evenly;'><span id='" +
+      state_list[0] +
+      "'>" +
+      state_list[0] +
+      "</span>" +
+      "<span><select id='" +
+      capital_list[0] +
+      "' onchange='valueSelected()'>" +
+      drpdwnTag +
+      "</select></span></div><br><br>";
+
+    for (let i = 1; i < state_list.length; i++) {
+      option_tag +=
+        "<div style='display:flex;justify-content:space-evenly;'><span id='" +
+        state_list[i] +
+        "'>" +
+        state_list[i] +
+        "</span>" +
+        "<span><select id='" +
+        capital_list[i] +
+        "' onchange='valueSelected()'>" +
+        drpdwnTag +
+        "</select></span></div><br><br>";
+    }
+  } else if (
+    questions[index].type === "MAQ" ||
+    questions[index].type === "MCQ"
+  ) {
     option_tag =
       '<div class="option"><span>' +
       questions[index].answer_choices[0] +
@@ -239,7 +315,12 @@ function showQuestions(index) {
     }
   }
   que_text.innerHTML = que_tag;
-  if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
+  if (questions[index].type === "MTF") {
+    option_list.innerHTML = option_tag;
+  } else if (
+    questions[index].type === "MAQ" ||
+    questions[index].type === "MCQ"
+  ) {
     option_list.innerHTML = option_tag;
     const option = option_list.querySelectorAll(".option");
     for (let i = 0; i < option.length; i++) {
@@ -260,9 +341,6 @@ function showQuestions(index) {
   }
 }
 
-// let tickIcon = '<div class="icon tick"><i class="fas fa-check"></i></div>';
-// let crossIcon = '<div class="icon cross"><i class="fas fa-times"></i></div>';
-
 function areEqual(array1, array2) {
   if (array1.length === array2.length) {
     return array1.every((element, index) => {
@@ -273,6 +351,18 @@ function areEqual(array1, array2) {
     });
   }
   return false;
+}
+
+function valueSelected() {
+  optionsSelected = [];
+  for (let val of document.querySelectorAll("select")) {
+    optionsSelected.push(val.options[val.selectedIndex].text);
+  }
+  if (!optionsSelected.includes("")) {
+    next_btn.style.display = "block";
+  } else {
+    next_btn.style.display = "none";
+  }
 }
 
 function valueEntered() {
@@ -373,34 +463,10 @@ function startTimer(time) {
       clearInterval(counter);
       timeCount.textContent = "00";
       timeOff.textContent = "Time Off";
-
-      let correctAns = questions[que_count].answer;
-      let allOptions = option_list.children.length;
-
-      for (let i = 0; i < allOptions; i++) {
-        if (option_list.children[i].textContent == correctAns) {
-          option_list.children[i].setAttribute("class", "option correct");
-          option_list.children[i].insertAdjacentHTML("beforeend", tickIcon);
-        }
-      }
-      for (let i = 0; i < allOptions; i++) {
-        option_list.children[i].classList.add("disabled");
-      }
-      next_btn.style.display = "block";
+      showResultBox(userScore);
     }
   }
 }
-
-// function startTimerLine(time) {
-//   counterLine = setInterval(timer, 29);
-//   function timer() {
-//     time++;
-//     timeLine.style.width = time + "px";
-//     if (time > 549) {
-//       clearInterval(counterLine);
-//     }
-//   }
-// }
 
 function queCounter(index) {
   const bottom_ques_counter = quiz_box.querySelector(".total_que");
