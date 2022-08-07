@@ -9,6 +9,7 @@ function setup() {
 let questions;
 
 const uploaded_file = document.getElementById("upload_file");
+const upload_btn = document.querySelector(".upload_btn");
 const start = document.getElementById("disabled");
 
 const renderQuestions = () => {
@@ -57,11 +58,13 @@ let totalTime = 0;
 //if start quiz button clicked
 start_btn.onclick = () => {
   info_box.classList.add("activeInfo"); //show the info box
+  upload_btn.style.display = "none";
 };
 
 //if exit button clicked
 exit_btn.onclick = () => {
   info_box.classList.remove("activeInfo"); //hide the info box
+  upload_btn.style.display = "block";
 };
 
 //if continue button clicked
@@ -344,17 +347,17 @@ function showQuestions(index) {
       option[i].setAttribute("onclick", "optionSelected(this)");
     }
   } else if (document.getElementById("FITB1")) {
-    document.getElementById("FITB1").setAttribute("onchange", "valueEntered()");
+    document.getElementById("FITB1").setAttribute("onkeyup", "valueEntered()");
   } else if (
     document.getElementById("FITB2_1") &&
     document.getElementById("FITB2_2")
   ) {
     document
       .getElementById("FITB2_1")
-      .setAttribute("onchange", "valueEntered()");
+      .setAttribute("onkeyup", "valueEntered()");
     document
       .getElementById("FITB2_2")
-      .setAttribute("onchange", "valueEntered()");
+      .setAttribute("onkeyup", "valueEntered()");
   }
 }
 
@@ -383,12 +386,15 @@ function valueSelected() {
 }
 
 function valueEntered() {
+  optionsSelected = [];
   if (
     document.getElementById("FITB1") &&
     document.getElementById("FITB1").value
   ) {
     userAns = document.getElementById("FITB1").value;
-    next_btn.style.display = "block";
+    if (userAns !== "") {
+      next_btn.style.display = "block";
+    }
     if (questions[que_count].type === "FITB1") {
       optionsSelected.push(userAns);
     }
@@ -398,7 +404,12 @@ function valueEntered() {
     document.getElementById("FITB2_2") &&
     document.getElementById("FITB2_2").value
   ) {
-    next_btn.style.display = "block";
+    if (
+      document.getElementById("FITB2_1").value !== "" &&
+      document.getElementById("FITB2_2").value !== ""
+    ) {
+      next_btn.style.display = "block";
+    }
     if (questions[que_count].type === "FITB2") {
       optionsSelected.push(document.getElementById("FITB2_1").value);
       optionsSelected.push(document.getElementById("FITB2_2").value);
@@ -409,15 +420,26 @@ function valueEntered() {
 }
 
 function optionSelected(answer) {
-  clearInterval(counterLine);
+  // clearInterval(counterLine);
   userAns = answer.textContent;
   if (questions[que_count].type === "MAQ") {
-    optionsSelected.push(userAns);
-
     if (answer.classList.contains("selected")) {
       answer.classList.remove("selected");
+      const index = optionsSelected.indexOf(userAns);
+      if (index > -1) {
+        // only splice array when item is found
+        optionsSelected.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      console.log(optionsSelected);
     } else {
       answer.classList.add("selected");
+      optionsSelected.push(userAns);
+      console.log(optionsSelected);
+    }
+    if (optionsSelected.length === 0) {
+      next_btn.style.display = "none";
+    } else {
+      next_btn.style.display = "block";
     }
   } else if (questions[que_count].type === "MCQ") {
     optionsSelected = [];
@@ -428,10 +450,9 @@ function optionSelected(answer) {
       list[i].classList.remove("selected");
     }
     answer.classList.add("selected");
+    next_btn.style.display = "block";
   }
   console.log(answer);
-
-  next_btn.style.display = "block";
 }
 
 function showResultBox(userScore) {
