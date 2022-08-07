@@ -1,12 +1,29 @@
+function setup() {
+  document.getElementById("buttonid").addEventListener("click", openDialog);
+  function openDialog() {
+    document.getElementById("upload_file").click();
+  }
+}
+
 //waiting till dom is loaded
 let questions;
 
-const renderQuestions = async () => {
-  let uri = "http://localhost:3000/questions";
+const uploaded_file = document.getElementById("upload_file");
 
-  const res = await fetch(uri);
-  questions = await res.json();
-  console.log(questions);
+const renderQuestions = () => {
+  uploaded_file.addEventListener("change", function (event) {
+    let files = event.target.files;
+    let file_to_read = files[0];
+    let fileread = new FileReader();
+    fileread.onload = function (e) {
+      let content = e.target.result;
+      let intern = JSON.parse(content);
+      questions = intern.questions;
+      console.log("File data=", questions);
+    };
+    fileread.readAsText(file_to_read);
+    alert("File uploaded successfully");
+  });
 };
 
 window.addEventListener("DOMContentLoaded", () => renderQuestions());
