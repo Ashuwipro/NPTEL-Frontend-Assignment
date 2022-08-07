@@ -10,6 +10,10 @@ body{
     background: #007bff;
 }
 
+button#disabled:hover{
+    cursor: not-allowed;
+}
+
 #buttonid{
     position: absolute;
     top: 30%;

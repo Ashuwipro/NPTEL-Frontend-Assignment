@@ -9,6 +9,7 @@ function setup() {
 let questions;
 
 const uploaded_file = document.getElementById("upload_file");
+const start = document.getElementById("disabled");
 
 const renderQuestions = () => {
   uploaded_file.addEventListener("change", function (event) {
@@ -20,9 +21,18 @@ const renderQuestions = () => {
       let intern = JSON.parse(content);
       questions = intern.questions;
       console.log("File data=", questions);
+
+      if (
+        questions[0].question !== null &&
+        questions[0].time !== null &&
+        questions[0].type !== null
+      ) {
+        alert("File uploaded successfully");
+        start.removeAttribute("id");
+        start.disabled = false;
+      }
     };
     fileread.readAsText(file_to_read);
-    alert("File uploaded successfully");
   });
 };
 
