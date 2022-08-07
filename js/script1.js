@@ -18,7 +18,6 @@ const exit_btn = document.querySelector(".buttons .quit");
 const continue_btn = document.querySelector(".buttons .restart");
 const quiz_box = document.querySelector(".quiz_box");
 const timeCount = quiz_box.querySelector(".timer .timer_sec");
-// const timeLine = quiz_box.querySelector("header .time_line");
 const timeOff = quiz_box.querySelector("header .time_text");
 
 const option_list = document.querySelector(".option_list");
@@ -51,7 +50,6 @@ continue_btn.onclick = () => {
   showQuestions(0);
   queCounter(1);
   startTimer(totalTime);
-  //   startTimerLine(0);
 };
 
 let que_count = 0;
@@ -93,7 +91,6 @@ restart_quiz.onclick = () => {
   clearInterval(counter);
   startTimer(timeValue);
   clearInterval(counterLine);
-  //   startTimerLine(widthValue);
   next_btn.style.display = "none";
   timeOff.textContent = "Time Left";
 };
@@ -132,7 +129,7 @@ next_btn.onclick = () => {
     } else if (questions[que_count].type === "FITB2") {
       correctAns = questions[que_count].answers;
 
-      //check if the array and their order is equal
+      //check if the array and their order are equal
       if (checkArrayEquality(correctAns, optionsSelected)) {
         userScore += 1;
       }
@@ -144,10 +141,7 @@ next_btn.onclick = () => {
     option_list.textContent = "";
     showQuestions(que_count);
     queCounter(que_numb);
-    // clearInterval(counter);
-    // startTimer(timeValue);
     clearInterval(counterLine);
-    // startTimerLine(widthValue);
     next_btn.style.display = "none";
     timeOff.textContent = "Time Left";
   } else {
@@ -159,7 +153,7 @@ next_btn.onclick = () => {
         for (let i = 0; i < questions[que_count].answer_options.length; i++) {
           correctAns.push(questions[que_count].answer_options[i].Capital);
         }
-        //check if the array and their order is equal
+        //check if the array and their order are equal
         if (checkArrayEquality(correctAns, optionsSelected)) {
           userScore += 1;
         }
@@ -198,15 +192,11 @@ function showQuestions(index) {
   let que_tag;
   if (questions[index].type === "MAQ" || questions[index].type === "MCQ") {
     que_tag =
-      "<span>" +
-      questions[index].numb +
-      ". " +
-      questions[index].question +
-      "</span>";
+      "<span>" + que_numb + ". " + questions[index].question + "</span>";
   } else if (questions[index].type === "FITB1") {
     que_tag =
       "<span>" +
-      questions[index].numb +
+      que_numb +
       ". " +
       questions[index].question.substring(
         0,
@@ -222,7 +212,7 @@ function showQuestions(index) {
   } else if (questions[index].type === "FITB2") {
     que_tag =
       "<span>" +
-      questions[index].numb +
+      que_numb +
       ". " +
       questions[index].question.substring(
         0,
@@ -244,7 +234,7 @@ function showQuestions(index) {
   } else if (questions[index].type === "MTF") {
     que_tag =
       "<span id='MTF'>" +
-      questions[index].numb +
+      que_numb +
       ". " +
       questions[index].question +
       "</span><br>" +
@@ -392,7 +382,6 @@ function valueEntered() {
 }
 
 function optionSelected(answer) {
-  //   clearInterval(counter);
   clearInterval(counterLine);
   userAns = answer.textContent;
   if (questions[que_count].type === "MAQ") {
@@ -463,6 +452,40 @@ function startTimer(time) {
       clearInterval(counter);
       timeCount.textContent = "00";
       timeOff.textContent = "Time Off";
+
+      if (questions[que_count].type === "MTF") {
+        correctAns = [];
+        for (let i = 0; i < questions[que_count].answer_options.length; i++) {
+          correctAns.push(questions[que_count].answer_options[i].Capital);
+        }
+        //check if the array and their order are equal
+        if (checkArrayEquality(correctAns, optionsSelected)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "MAQ") {
+        correctAns = questions[que_count].answers;
+        if (areEqual(optionsSelected, correctAns)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "MCQ") {
+        correctAns = questions[que_count].answer;
+        if (optionsSelected.includes(correctAns)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "FITB1") {
+        correctAns = questions[que_count].answers;
+        if (areEqual(optionsSelected, correctAns)) {
+          userScore += 1;
+        }
+      } else if (questions[que_count].type === "FITB2") {
+        correctAns = questions[que_count].answers;
+
+        //check if the array and their order are equal
+        if (checkArrayEquality(correctAns, optionsSelected)) {
+          userScore += 1;
+        }
+      }
+
       showResultBox(userScore);
     }
   }

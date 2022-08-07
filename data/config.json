@@ -1,7 +1,6 @@
 {
   "questions":[
     {
-      "numb":1,
       "question":"Match the following capitals with states",
       "type":"MTF",
       "time":20,
@@ -14,7 +13,6 @@
       ]
     },
   {
-    "numb": 2,
     "question":
       "India is {} largest country by population and ranks {} in terms of landmass",
     "type": "FITB2",
@@ -22,14 +20,12 @@
     "answers": ["second", "seventh"]
   },
   {
-    "numb": 3,
     "question": "India is {} largest country by population",
     "type": "FITB1",
     "time": 20,
     "answers": ["second"]
   },
   {
-    "numb": 4,
     "question": "Select top two countries which has highest GDP?",
     "type": "MAQ",
     "time": 20,
@@ -37,7 +33,6 @@
     "answers": ["USA", "China"]
   },
   {
-    "numb": 5,
     "question":
       "Which among the following is the most valuable company in the world?",
     "type": "MCQ",
