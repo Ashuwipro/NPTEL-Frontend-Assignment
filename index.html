@@ -1,7 +1,76 @@
-<html>
-  <head>
-    <title>Hello World</title>
-  </head>
-  <body>Hello World!!!
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body onload="setup()">
+    <!-- Start quiz button -->
+    <form enctype="multipart/form-data">
+        <div class="upload_btn">
+            <input type="file" id="upload_file" hidden/>
+            <input type="button" id="buttonid" value="Upload File"/>
+        </div>
+    </form>
+    <div class="start_btn"><button id="disabled" disabled>Start Quiz</button></div>
+
+    <!-- info box -->
+    <div class="info_box">
+        <div class="info_title">
+            <span>Some Rules of this Quiz</span>
+        </div>
+        <div class="info_list">
+            <div class="info">1. You can't select any option once time goes off.</div>
+            <div class="info">2. You can't exit from the quiz while you're playing.</div>
+            <div class="info">3. You'll get points on the basis of your correct answers.</div>
+        </div>
+        <div class="buttons">
+            <button class="quit">Exit Quiz</button>
+            <button class="restart">Continue</button>
+        </div>
+    </div>
+
+    <!-- Quiz Box -->
+    <div class="quiz_box">
+        <header>
+            <div class="title">Quiz Application</div>
+            <div class="timer">
+                <div class="time_text">Time Left</div>
+                <div class="timer_sec">00</div>
+            </div>
+        </header>
+        <section>
+            <div class="que_text">
+            </div>
+            <div class="option_list">
+                
+            </div>
+        </section>
+
+        <!-- Quiz box footer -->
+        <footer>
+            <div class="total_que">
+            </div>
+            <button class="next_btn">Next Que</button>
+        </footer>
+    </div>
+
+    <!-- Result box -->
+    <div class="result_box">
+        <div class="icon">
+            <i class="fas fa-crown"></i>
+        </div>
+        <div class="complete_text">You've completed the Quiz!</div>
+        <div class="score_text">
+        </div>
+        <div class="buttons">
+            <button class="restart">Replay Quiz</button>
+            <button class="quit">Quit Quiz</button>
+        </div>
+    </div>
+
+    <script src="script1.js"></script>
+
+</body>
 </html>
